@@ -1,37 +1,49 @@
-import { useState } from 'react'
+import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import { useDispatch, useSelector } from 'react-redux'
+import { Form, Button, Input } from 'antd'
 import './register.scss'
 import Logo from '../../images/rotten-tomatoes-logo.png'
+import { registerThunk } from '../../redux/actions/userActions.js'
 
 const Register = () => {
-    const [inputs, setInputs] = useState({
-        username: '',
-        email: '',
-        password: '',
-    })
-    const [err, setErr] = useState(null)
+    // const [inputs, setInputs] = useState({
+    //     username: '',
+    //     email: '',
+    //     password: '',
+    // })
+    // const [err, setErr] = useState(null)
+    const dispatch = useDispatch()
     const navigate = useNavigate()
 
-    const handleChange = (e) => {
-        setInputs((prev) => ({
-            ...prev,
-            [e.target.name]: e.target.value,
-        }))
+    const userRegister = useSelector((state) => state.userRegister)
+    console.log('userRegister: ' + JSON.stringify(userRegister))
+
+    const { error, userInfo } = userRegister
+
+    // const handleChange = (e) => {
+    //     setInputs((prev) => ({
+    //         ...prev,
+    //         [e.target.name]: e.target.value,
+    //     }))
+    // }
+
+    const onFinish = (values) => {
+        const email = values.email
+        const password = values.password
+        dispatch(registerThunk({ email, password }))
+
+        console.log('values: ' + JSON.stringify(values))
+        console.log('email: ' + email)
+        console.log('password: ' + password)
     }
 
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        try {
-            const res = await axios.post(
-                'http://localhost:8800/api/auth/register',
-                inputs,
-            )
+    useEffect(() => {
+        console.log('userInfo when Register is redered: ' + userInfo)
+        if (userInfo) {
             navigate('/login')
-        } catch (err) {
-            setErr(err.response.data)
         }
-    }
+    }, [userInfo])
 
     return (
         <div className="register">
@@ -48,36 +60,64 @@ const Register = () => {
             </div>
             <div className="container">
                 <h1>Register</h1>
-                <form>
-                    <input
-                        required
-                        type="text"
+                <Form
+                    name="normal_register"
+                    className="register-form"
+                    initialValues={{
+                        remember: true,
+                    }}
+                    onFinish={onFinish}
+                >
+                    {/* <Form.Item
                         name="username"
-                        placeholder="Username"
-                        onChange={handleChange}
-                    />
-                    <input
-                        required
-                        type="email"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Please input your username!',
+                            },
+                        ]}
+                    >
+                        <Input placeholder="Username" />
+                    </Form.Item> */}
+                    <Form.Item
                         name="email"
-                        placeholder="Email"
-                        onChange={handleChange}
-                    />
-                    <input
-                        required
-                        type="password"
+                        rules={[
+                            {
+                                required: true,
+                                type: 'email',
+                                message: 'Please input a valid email!',
+                            },
+                        ]}
+                    >
+                        <Input placeholder="Email" />
+                    </Form.Item>
+                    <Form.Item
                         name="password"
-                        placeholder="Password"
-                        onChange={handleChange}
-                    />
-                    <button onClick={handleSubmit}>Register</button>
-                    {err && <p>{err}</p>}
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Please input your password!',
+                            },
+                        ]}
+                    >
+                        <Input.Password placeholder="Password" />
+                    </Form.Item>
+                    <Form.Item>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            className="register-form-button"
+                            size="large"
+                        >
+                            Register
+                        </Button>
+                    </Form.Item>
                     <span>
                         Do you have an account?
                         <br />
                         <Link to="/login">Login</Link>
                     </span>
-                </form>
+                </Form>
             </div>
         </div>
     )

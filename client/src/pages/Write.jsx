@@ -18,20 +18,29 @@ const Write = () => {
         try {
             const formData = new FormData()
             if (file) {
+                console.log('file: ', file)
                 formData.append('file', file)
             }
-            const res = await axios.post(
-                'http://localhost:8800/api/upload',
+            const { data } = await axios.post(
+                'http://localhost:8800/api/files/upload',
                 formData,
             )
-            return res.data
+            console.log('data: ', data)
+            return data.filename
         } catch (err) {}
     }
 
     const handlePublish = async (e) => {
         e.preventDefault()
+        const formattedDate = new Date()
+            .toISOString()
+            .slice(0, 19)
+            .replace('T', ' ')
+        console.log('formattedDate: ', formattedDate)
         const imgUrl = await upload()
-        const userData = JSON.parse(localStorage.getItem('user'))
+        const userData = JSON.parse(localStorage.getItem('userInfo'))
+
+        console.log('userData: ', userData)
         const token = userData ? userData.access_token : null
 
         try {
@@ -41,8 +50,8 @@ const Write = () => {
                       {
                           title,
                           desc: value,
-                          cat,
                           img: file ? imgUrl : '',
+                          cat,
                       },
                       {
                           headers: {
@@ -58,9 +67,7 @@ const Write = () => {
                           desc: value,
                           cat,
                           img: file ? imgUrl : '',
-                          date: moment(Date.now()).format(
-                              'YYYY-MM-DD HH:mm:ss',
-                          ),
+                          date: formattedDate,
                       },
                       {
                           headers: {

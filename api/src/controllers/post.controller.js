@@ -1,6 +1,7 @@
-import { db } from '../db.js'
+import { db } from '../databases/init.mysql.js'
 import jwt from 'jsonwebtoken'
 
+// /api/posts
 export const getPosts = (req, res) => {
     const q = req.query.cat
         ? 'SELECT * FROM posts WHERE cat=?'
@@ -17,9 +18,10 @@ export const getPosts = (req, res) => {
     })
 }
 
+// /api/posts/:id
 export const getPost = (req, res) => {
     const q =
-        'SELECT p.id, `username`, `title`, `desc`, p.img, u.img AS userImg, `cat`, `date` FROM users u JOIN posts p ON u.id=p.uid WHERE p.id = ?'
+        'SELECT p.id, `name`, `title`, `desc`, p.img, u.profileImg, `cat`, `date`, p.uid FROM users u JOIN posts p ON u.id=p.uid WHERE p.id = ?'
 
     db.query(q, [req.params.id], (err, data) => {
         if (err) {
@@ -30,8 +32,8 @@ export const getPost = (req, res) => {
     })
 }
 
+// /api/posts
 export const addPost = (req, res) => {
-    // const token = req.cookies.access_token
     const authHeader = req.headers.authorization || null
     const token = authHeader.split(' ')[1] || null
 
@@ -41,7 +43,7 @@ export const addPost = (req, res) => {
         return res.status(401).json('Not authenticated!')
     }
 
-    jwt.verify(token, 'jwtkey', (err, userInfo) => {
+    jwt.verify(token, process.env.JWT_KEY, (err, userInfo) => {
         if (err) {
             return res.status(403).json('Token is not valid')
         }

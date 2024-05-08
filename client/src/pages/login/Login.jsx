@@ -1,36 +1,36 @@
-import { useContext, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Form, Button } from 'antd'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 import Logo from '../../images/rotten-tomatoes-logo.png'
+import LoginForm from '../../forms/LoginForm.jsx'
 import './login.scss'
-import { AuthContext } from '../../context/authContext.jsx'
+import { loginThunk } from '../../redux/actions/userActions.js'
 
 const Login = () => {
-    const [inputs, setInputs] = useState({
-        username: '',
-        password: '',
-    })
-    const [err, setErr] = useState(null)
+    const dispatch = useDispatch()
+    const location = useLocation()
     const navigate = useNavigate()
 
-    const { login } = useContext(AuthContext)
+    const userLogin = useSelector((state) => state.userLogin)
+    console.log('userLogin: ' + JSON.stringify(userLogin))
 
-    const handleChange = (e) => {
-        setInputs((prev) => {
-            return {
-                ...prev,
-                [e.target.name]: e.target.value,
-            }
-        })
-    }
+    const { error, userInfo } = userLogin
 
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        try {
-            await login(inputs)
-            navigate('/')
-        } catch (err) {
-            setErr(err.response.data)
+    console.log('location.search: ' + location.search)
+
+    const redirect = new URLSearchParams(location.search).get('redirect') || '/'
+
+    useEffect(() => {
+        if (userInfo) {
+            navigate(redirect)
         }
+    }, [navigate, userInfo, redirect])
+
+    const onFinish = (values) => {
+        const email = values.email
+        const password = values.password
+        dispatch(loginThunk({ email, password }))
     }
 
     return (
@@ -41,36 +41,28 @@ const Login = () => {
                     {/* <button className="loginButton">Sign In</button> */}
                 </div>
             </div>
-            <div className="container">
-                <h1>Log In</h1>
-                <form>
-                    <input
-                        required
-                        type="text"
-                        name="username"
-                        placeholder="Username"
-                        onChange={handleChange}
-                    />
-                    <input
-                        required
-                        type="password"
-                        name="password"
-                        placeholder="Password"
-                        onChange={handleChange}
-                    />
-                    <button className="loginButton" onClick={handleSubmit}>
-                        Sign In
-                    </button>
-                    {err && <p>{err}</p>}
-                    <span>
-                        Forgot your password? <b>Reset it here</b>
-                    </span>
-                    <span>
-                        New to Rotten Tomatoes?
-                        <br />
-                        <Link to="/register">Sign up now</Link>
-                    </span>
-                </form>
+            <div className="containerLogin">
+                <h1>Login</h1>
+                <Form
+                    name="normal_login"
+                    className="login-form"
+                    initialValues={{
+                        remember: true,
+                    }}
+                    onFinish={onFinish}
+                >
+                    <LoginForm />
+                    <Form.Item>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            className="login-form-button"
+                            size="large"
+                        >
+                            Einloggen
+                        </Button>
+                    </Form.Item>
+                </Form>
             </div>
         </div>
     )

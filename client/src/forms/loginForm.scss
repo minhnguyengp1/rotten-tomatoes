@@ -1,0 +1,21 @@
+.login-form-container {
+    max-width: 300px;
+    margin: 0 auto;
+    color: black;
+
+    .ant-form-item {
+        margin-bottom: 15px; // Adjust spacing between form items
+    }
+
+    .ant-input {
+        color: black; // Set the text color for all inputs to black
+    }
+
+    .login-form-forgot {
+        float: right;
+    }
+
+    .site-form-item-icon {
+        color: black;
+    }
+}

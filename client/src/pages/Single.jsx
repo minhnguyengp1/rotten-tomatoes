@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from 'react'
 import EditImgage from '../images/edit.png'
 import DeleteImage from '../images/delete.png'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import Menu from '../components/Menu'
 import axios from 'axios'
 import moment from 'moment'
-import { AuthContext } from '../context/authContext'
 
 const Single = () => {
     const [post, setPost] = useState({})
@@ -15,26 +15,34 @@ const Single = () => {
 
     const postId = location.pathname.split('/')[2]
 
-    const { currentUser } = useContext(AuthContext)
+    // const { currentUser } = useContext(AuthContext)
+    const userLogin = useSelector((state) => state.userLogin)
+    const { userInfo } = userLogin
+
+    console.log('userInfo in Single: ' + JSON.stringify(userInfo))
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await axios.get(
+                const response = await axios.get(
                     `http://localhost:8800/api/posts/${postId}`,
                 )
-                setPost(res.data)
+                console.log(
+                    'response.data in Single.jsx: ' +
+                        JSON.stringify(response.data),
+                )
+                setPost(response.data)
             } catch (err) {
                 console.log(err)
             }
         }
 
         fetchData()
-    }, [postId])
+    }, [postId, userInfo])
 
     const handleDelete = async (e) => {
         try {
-            const res = await axios.delete(
+            const response = await axios.delete(
                 `http://localhost:8800/api/posts/${postId}`,
             )
             navigate('/')
@@ -46,16 +54,16 @@ const Single = () => {
     return (
         <div className="single">
             <div className="content">
-                <img src={post?.img} alt="" />
+                <img src={`../upload/${post?.img}`} alt="" />
                 <div className="user">
-                    {post.userImg && <img src={post.userImg} alt="" />}
+                    {post.profileImg && <img src={post.profileImg} alt="" />}
                     <div className="info">
-                        <span>{post.username}</span>
+                        <span>{post.name}</span>
                         <p>
                             Posted {post.date} and {moment(post.date).fromNow()}
                         </p>
                     </div>
-                    {currentUser.username === post.username && (
+                    {userInfo && userInfo.userId === post.uid && (
                         <div className="edit">
                             <Link to={`/write?edit=2`} state={post}>
                                 <img src={EditImgage} alt="" />

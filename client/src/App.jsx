@@ -1,7 +1,7 @@
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom'
 import Register from './pages/register/Register.jsx'
 import Login from './pages/login/Login'
-import Home from './pages/Home'
+import Home from './pages/home/Home'
 import NavBar from './components/NavBar'
 import Footer from './components/Footer'
 import Single from './pages/Single'

@@ -32,6 +32,10 @@ $redTomato: #fa2e03;
                 font-size: 16px;
                 font-weight: 500;
                 cursor: pointer;
+
+                &:hover {
+                    background-color: #ed6d8d;
+                }
             }
         }
     }
@@ -51,24 +55,33 @@ $redTomato: #fa2e03;
             font-size: 50px;
         }
 
-        form {
+        .register-form-button {
+            width: 100%;
+        }
+
+        Form {
             display: flex;
             flex-direction: column;
             background-color: #fa2e03;
-            padding: 40px;
-            width: 200px;
-            gap: 10px;
+            padding: 30px;
+            width: 300px;
+            gap: 20px;
 
-            input {
+            .ant-form-item-explain-error {
+                color: white;
+            }
+
+            Input {
                 padding: 10px;
                 border: none;
                 border-bottom: 1px solid gray;
+                color: black;
             }
 
-            button {
+            Button {
                 padding: 10px;
                 border: none;
-                background-color: #fa2e03;
+                background-color: #34160f;
                 color: white;
             }
 
